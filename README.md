@@ -236,9 +236,9 @@ To test Hallucination/Faithfulness:
 
 ## 10. Conclusion: The Composite Engineer Score (CES)
 
-To answer the developer's query: "How am I going to evaluate?"
+To synthesize a practical application from these diverse paradigms, a unified operational metric is required.
 
-You must calculate the Composite Engineer Score (CES), a weighted aggregation of the cross-domain metrics established above.
+This framework proposes the Composite Engineer Score (CES), calculated as a weighted aggregation of the cross-domain metrics established above.
 
 Where:
 
@@ -250,7 +250,7 @@ Where:
 
 **Final Recommendation:** The research overwhelmingly suggests that while AI models can currently achieve high scores on SR for isolated tasks (Level 1-2 Autonomy), they score poorly on MI, FOR, and Risk for long-horizon engineering (Level 3-4). They are prone to architectural entropy, silent failures, and security blindness.
 
-Therefore, you should not evaluate the model as a Replacement (Substitute), but as a Prosthetic (Augment). The metrics should guide you not in "leaving the loop," but in designing the "Human-Machine Teaming" interface to compensate for the agent's deficits in judgment, safety, and architectural continuity. Until the CES score approaches human parity across all domains—not just coding speed—the human engineer remains the essential guarantor of the system's reality.
+Therefore, the model should not be evaluated as a Replacement (Substitute), but as a Prosthetic (Augment). These metrics serve not to facilitate "human-out-of-the-loop" workflows, but to guide the design of "Human-Machine Teaming" interfaces to compensate for the agent's deficits in judgment, safety, and architectural continuity. Until the CES score approaches human parity across all domains—not just coding speed—the human engineer remains the essential guarantor of the system's reality.
 
 ### Works cited
 
