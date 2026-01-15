@@ -1,0 +1,205 @@
+Artificial Architect System Initializing...
+⚠️ ANTHROPIC_API_KEY not found - will use OpenAI GPT-4.1 for Brain
+Initializing Agent for: general
+⚠️ Anthropic API key not configured, using OpenAI GPT-4.1
+--- Starting Agent Tools ---
+Sandbox started: 91052b3b1d
+Running Shadow Mode Evaluation
+Dataset: datasets/flask_pr5818.json
+Loaded 1 test cases
+
+Testing Case: pr-5818
+⌛ Sandbox Time Travel: Checking out e7e5380...
+--- Orienting on: pass context through dispatch methods
+
+The current... ---
+[DEBUG] State keys: ['issue_id', 'issue_description', 'repo_path', 'retrieved_context', 'known_dependencies', 'plan', 'current_step', 'generated_diff', 'safety_score', 'compliance_score', 'faithfulness_score', 'risk_level', 'risk_score', 'mttr_seconds', 'tokens_used', 'models_used', 'critic_feedback', 'retry_count', 'status']
+[DEBUG] State types: [('issue_id', 'str'), ('issue_description', 'str'), ('repo_path', 'str'), ('retrieved_context', 'list'), ('known_dependencies', 'list'), ('plan', 'list'), ('current_step', 'int'), ('generated_diff', 'NoneType'), ('safety_score', 'int'), ('compliance_score', 'int'), ('faithfulness_score', 'int'), ('risk_level', 'str'), ('risk_score', 'int'), ('mttr_seconds', 'int'), ('tokens_used', 'dict'), ('models_used', 'dict'), ('critic_feedback', 'list'), ('retry_count', 'int'), ('status', 'str')]
+[WARNING] Repo folder 'repos/flask' missing. Triggering Auto-Indexing...
+🌍 World Builder: Setting up https://github.com/pallets/flask...
+Cloning https://github.com/pallets/flask...
+Cloning into '/app/repos/flask'...
+Updating files:  21% (51/234)Updating files:  22% (52/234)Updating files:  23% (54/234)Updating files:  24% (57/234)Updating files:  25% (59/234)Updating files:  25% (60/234)Updating files:  26% (61/234)Updating files:  27% (64/234)Updating files:  28% (66/234)Updating files:  29% (68/234)Updating files:  30% (71/234)Updating files:  31% (73/234)Updating files:  32% (75/234)Updating files:  33% (78/234)Updating files:  34% (80/234)Updating files:  35% (82/234)Updating files:  36% (85/234)Updating files:  37% (87/234)Updating files:  38% (89/234)Updating files:  39% (92/234)Updating files:  40% (94/234)Updating files:  41% (96/234)Updating files:  42% (99/234)Updating files:  43% (101/234)Updating files:  43% (102/234)Updating files:  44% (103/234)Updating files:  45% (106/234)Updating files:  46% (108/234)Updating files:  47% (110/234)Updating files:  48% (113/234)Updating files:  49% (115/234)Updating files:  50% (117/234)Updating files:  51% (120/234)Updating files:  51% (121/234)Updating files:  52% (122/234)Updating files:  53% (125/234)Updating files:  54% (127/234)Updating files:  55% (129/234)Updating files:  55% (131/234)Updating files:  56% (132/234)Updating files:  57% (134/234)Updating files:  58% (136/234)Updating files:  59% (139/234)Updating files:  60% (141/234)Updating files:  61% (143/234)Updating files:  62% (146/234)Updating files:  63% (148/234)Updating files:  64% (150/234)Updating files:  65% (153/234)Updating files:  66% (155/234)Updating files:  66% (156/234)Updating files:  67% (157/234)Updating files:  68% (160/234)Updating files:  69% (162/234)Updating files:  70% (164/234)Updating files:  71% (167/234)Updating files:  72% (169/234)Updating files:  73% (171/234)Updating files:  74% (174/234)Updating files:  75% (176/234)Updating files:  75% (177/234)Updating files:  76% (178/234)Updating files:  77% (181/234)Updating files:  78% (183/234)Updating files:  79% (185/234)Updating files:  79% (186/234)Updating files:  80% (188/234)Updating files:  81% (190/234)Updating files:  82% (192/234)Updating files:  83% (195/234)Updating files:  83% (196/234)Updating files:  84% (197/234)Updating files:  85% (199/234)Updating files:  86% (202/234)Updating files:  86% (203/234)Updating files:  87% (204/234)Updating files:  88% (206/234)Updating files:  89% (209/234)Updating files:  90% (211/234)Updating files:  91% (213/234)Updating files:  91% (215/234)Updating files:  92% (216/234)Updating files:  93% (218/234)Updating files:  94% (220/234)Updating files:  95% (223/234)Updating files:  96% (225/234)Updating files:  97% (227/234)Updating files:  98% (230/234)Updating files:  99% (232/234)Updating files: 100% (234/234)Updating files: 100% (234/234), done.
+Triggering Zoekt Indexer for flask...
+Indexing flask...
+Zoekt Indexing Triggered Successfully
+Populating Knowledge Graph for flask...
+Graph population is currently a stub (Waiting for AST parser implementation)
+✅ World Build Complete for flask!
+[DEBUG] Zoekt query: pass context through repo:flask
+[DEBUG] Zoekt response keys: ['Result']
+[DEBUG] Zoekt returned 0 file objects from Result.Files
+[DEBUG] Zoekt returned 0 results
+[WARNING] No files found in index even after pre-check. Re-triggering indexing just in case.
+🌍 World Builder: Setting up https://github.com/pallets/flask...
+Repo flask already exists. Pulling latest...
+Already up to date.
+Triggering Zoekt Indexer for flask...
+Indexing flask...
+Zoekt Indexing Triggered Successfully
+Populating Knowledge Graph for flask...
+Graph population is currently a stub (Waiting for AST parser implementation)
+✅ World Build Complete for flask!
+[INFO] Indexing complete. Retrying search...
+[DEBUG] Zoekt response keys: ['Result']
+[DEBUG] Zoekt returned 17 file objects from Result.Files
+[DEBUG] First file keys: ['FileName', 'Repository', 'Version', 'Language', 'Branches', 'LineMatches', 'Checksum', 'Score']
+--- Found 17 files and 0 dependencies ---
+[DEBUG] Returning context_snippets type: <class 'list'>
+--- Architecting Plan ---
+[DEBUG] plan_node received state keys: ['issue_id', 'issue_description', 'repo_path', 'retrieved_context', 'known_dependencies', 'plan', 'current_step', 'generated_diff', 'safety_score', 'compliance_score', 'faithfulness_score', 'risk_level', 'risk_score', 'mttr_seconds', 'tokens_used', 'models_used', 'critic_feedback', 'retry_count', 'status']
+[DEBUG] retrieved_context type: <class 'list'>
+[DEBUG] retrieved_context value: ['File Found: src/flask/ctx.py', 'File Found: src/flask/app.py', 'File Found: src/flask/cli.py', 'File Found: tests/test_helpers.py', 'File Found: src/flask/sansio/app.py', 'File Found: tests/test_basic.py', 'File Found: docs/appcontext.rst', 'File Found: CHANGES.rst', 'File Found: docs/design.rst', 'File Found: docs/testing.rst', 'File Found: docs/lifecycle.rst', 'File Found: docs/quickstart.rst', 'File Found: src/flask/testing.py', 'File Found: src/flask/sessions.py', 'File Found: docs/extensiondev.rst', 'File Found: docs/errorhandling.rst', 'File Found: docs/patterns/celery.rst']
+[DEBUG] Calling LLM with input_vars keys: ['issue', 'context']
+[DEBUG] LLM responded with content length: 3946
+[DEBUG] tokens before: {'brain': 0, 'critics': 0, 'total': 0}
+[DEBUG] Added 1161 tokens
+[DEBUG] Returning plan with 112 steps
+--- Writing Implementation ---
+[DEBUG] Reading file from Sandbox: src/flask/ctx.py
+[WARNING] File not found in sandbox: src/flask/ctx.py
+[DEBUG] Reading file from Sandbox: src/flask/app.py
+[WARNING] File not found in sandbox: src/flask/app.py
+[DEBUG] Reading file from Sandbox: src/flask/cli.py
+[WARNING] File not found in sandbox: src/flask/cli.py
+[DEBUG] Reading file from Sandbox: tests/test_helpers.py
+[WARNING] File not found in sandbox: tests/test_helpers.py
+[DEBUG] Reading file from Sandbox: src/flask/sansio/app.py
+[WARNING] File not found in sandbox: src/flask/sansio/app.py
+[DEBUG] Reading file from Sandbox: tests/test_basic.py
+[WARNING] File not found in sandbox: tests/test_basic.py
+[DEBUG] Reading file from Sandbox: docs/appcontext.rst
+[WARNING] File not found in sandbox: docs/appcontext.rst
+[DEBUG] Reading file from Sandbox: CHANGES.rst
+[WARNING] File not found in sandbox: CHANGES.rst
+[DEBUG] Reading file from Sandbox: docs/design.rst
+[WARNING] File not found in sandbox: docs/design.rst
+[DEBUG] Reading file from Sandbox: docs/testing.rst
+[WARNING] File not found in sandbox: docs/testing.rst
+[DEBUG] Reading file from Sandbox: docs/lifecycle.rst
+[WARNING] File not found in sandbox: docs/lifecycle.rst
+[DEBUG] Reading file from Sandbox: docs/quickstart.rst
+[WARNING] File not found in sandbox: docs/quickstart.rst
+[DEBUG] Reading file from Sandbox: src/flask/testing.py
+[WARNING] File not found in sandbox: src/flask/testing.py
+[DEBUG] Reading file from Sandbox: src/flask/sessions.py
+[WARNING] File not found in sandbox: src/flask/sessions.py
+[DEBUG] Reading file from Sandbox: docs/extensiondev.rst
+[WARNING] File not found in sandbox: docs/extensiondev.rst
+[DEBUG] Reading file from Sandbox: docs/errorhandling.rst
+[WARNING] File not found in sandbox: docs/errorhandling.rst
+[DEBUG] Reading file from Sandbox: docs/patterns/celery.rst
+[WARNING] File not found in sandbox: docs/patterns/celery.rst
+--- Running Critic Loop ---
+Semgrep failed: 
+--- Score: 80/100 ---
+Safety score 80 < 90 (Attempt 1/3), retrying...
+--- PR REJECTED (Retrying) ---
+--- Architecting Plan ---
+[DEBUG] plan_node received state keys: ['issue_id', 'issue_description', 'repo_path', 'retrieved_context', 'known_dependencies', 'plan', 'current_step', 'generated_diff', 'safety_score', 'compliance_score', 'faithfulness_score', 'risk_level', 'risk_score', 'mttr_seconds', 'tokens_used', 'models_used', 'critic_feedback', 'retry_count', 'status']
+[DEBUG] retrieved_context type: <class 'list'>
+[DEBUG] retrieved_context value: ['File Found: src/flask/ctx.py', 'File Found: src/flask/app.py', 'File Found: src/flask/cli.py', 'File Found: tests/test_helpers.py', 'File Found: src/flask/sansio/app.py', 'File Found: tests/test_basic.py', 'File Found: docs/appcontext.rst', 'File Found: CHANGES.rst', 'File Found: docs/design.rst', 'File Found: docs/testing.rst', 'File Found: docs/lifecycle.rst', 'File Found: docs/quickstart.rst', 'File Found: src/flask/testing.py', 'File Found: src/flask/sessions.py', 'File Found: docs/extensiondev.rst', 'File Found: docs/errorhandling.rst', 'File Found: docs/patterns/celery.rst']
+[DEBUG] Calling LLM with input_vars keys: ['issue', 'context']
+[DEBUG] LLM responded with content length: 4495
+[DEBUG] tokens before: {'brain': 6137, 'critics': 0, 'total': 6137}
+[DEBUG] Added 1272 tokens
+[DEBUG] Returning plan with 127 steps
+--- Writing Implementation ---
+[DEBUG] Reading file from Sandbox: src/flask/ctx.py
+[WARNING] File not found in sandbox: src/flask/ctx.py
+[DEBUG] Reading file from Sandbox: src/flask/app.py
+[WARNING] File not found in sandbox: src/flask/app.py
+[DEBUG] Reading file from Sandbox: src/flask/cli.py
+[WARNING] File not found in sandbox: src/flask/cli.py
+[DEBUG] Reading file from Sandbox: tests/test_helpers.py
+[WARNING] File not found in sandbox: tests/test_helpers.py
+[DEBUG] Reading file from Sandbox: src/flask/sansio/app.py
+[WARNING] File not found in sandbox: src/flask/sansio/app.py
+[DEBUG] Reading file from Sandbox: tests/test_basic.py
+[WARNING] File not found in sandbox: tests/test_basic.py
+[DEBUG] Reading file from Sandbox: docs/appcontext.rst
+[WARNING] File not found in sandbox: docs/appcontext.rst
+[DEBUG] Reading file from Sandbox: CHANGES.rst
+[WARNING] File not found in sandbox: CHANGES.rst
+[DEBUG] Reading file from Sandbox: docs/design.rst
+[WARNING] File not found in sandbox: docs/design.rst
+[DEBUG] Reading file from Sandbox: docs/testing.rst
+[WARNING] File not found in sandbox: docs/testing.rst
+[DEBUG] Reading file from Sandbox: docs/lifecycle.rst
+[WARNING] File not found in sandbox: docs/lifecycle.rst
+[DEBUG] Reading file from Sandbox: docs/quickstart.rst
+[WARNING] File not found in sandbox: docs/quickstart.rst
+[DEBUG] Reading file from Sandbox: src/flask/testing.py
+[WARNING] File not found in sandbox: src/flask/testing.py
+[DEBUG] Reading file from Sandbox: src/flask/sessions.py
+[WARNING] File not found in sandbox: src/flask/sessions.py
+[DEBUG] Reading file from Sandbox: docs/extensiondev.rst
+[WARNING] File not found in sandbox: docs/extensiondev.rst
+[DEBUG] Reading file from Sandbox: docs/errorhandling.rst
+[WARNING] File not found in sandbox: docs/errorhandling.rst
+[DEBUG] Reading file from Sandbox: docs/patterns/celery.rst
+[WARNING] File not found in sandbox: docs/patterns/celery.rst
+--- Running Critic Loop ---
+Semgrep failed: 
+--- Score: 80/100 ---
+Safety score 80 < 90 (Attempt 2/3), retrying...
+--- PR REJECTED (Retrying) ---
+--- Architecting Plan ---
+[DEBUG] plan_node received state keys: ['issue_id', 'issue_description', 'repo_path', 'retrieved_context', 'known_dependencies', 'plan', 'current_step', 'generated_diff', 'safety_score', 'compliance_score', 'faithfulness_score', 'risk_level', 'risk_score', 'mttr_seconds', 'tokens_used', 'models_used', 'critic_feedback', 'retry_count', 'status']
+[DEBUG] retrieved_context type: <class 'list'>
+[DEBUG] retrieved_context value: ['File Found: src/flask/ctx.py', 'File Found: src/flask/app.py', 'File Found: src/flask/cli.py', 'File Found: tests/test_helpers.py', 'File Found: src/flask/sansio/app.py', 'File Found: tests/test_basic.py', 'File Found: docs/appcontext.rst', 'File Found: CHANGES.rst', 'File Found: docs/design.rst', 'File Found: docs/testing.rst', 'File Found: docs/lifecycle.rst', 'File Found: docs/quickstart.rst', 'File Found: src/flask/testing.py', 'File Found: src/flask/sessions.py', 'File Found: docs/extensiondev.rst', 'File Found: docs/errorhandling.rst', 'File Found: docs/patterns/celery.rst']
+[DEBUG] Calling LLM with input_vars keys: ['issue', 'context']
+[DEBUG] LLM responded with content length: 4702
+[DEBUG] tokens before: {'brain': 12192, 'critics': 0, 'total': 12192}
+[DEBUG] Added 1296 tokens
+[DEBUG] Returning plan with 127 steps
+--- Writing Implementation ---
+[DEBUG] Reading file from Sandbox: src/flask/ctx.py
+[WARNING] File not found in sandbox: src/flask/ctx.py
+[DEBUG] Reading file from Sandbox: src/flask/app.py
+[WARNING] File not found in sandbox: src/flask/app.py
+[DEBUG] Reading file from Sandbox: src/flask/cli.py
+[WARNING] File not found in sandbox: src/flask/cli.py
+[DEBUG] Reading file from Sandbox: tests/test_helpers.py
+[WARNING] File not found in sandbox: tests/test_helpers.py
+[DEBUG] Reading file from Sandbox: src/flask/sansio/app.py
+[WARNING] File not found in sandbox: src/flask/sansio/app.py
+[DEBUG] Reading file from Sandbox: tests/test_basic.py
+[WARNING] File not found in sandbox: tests/test_basic.py
+[DEBUG] Reading file from Sandbox: docs/appcontext.rst
+[WARNING] File not found in sandbox: docs/appcontext.rst
+[DEBUG] Reading file from Sandbox: CHANGES.rst
+[WARNING] File not found in sandbox: CHANGES.rst
+[DEBUG] Reading file from Sandbox: docs/design.rst
+[WARNING] File not found in sandbox: docs/design.rst
+[DEBUG] Reading file from Sandbox: docs/testing.rst
+[WARNING] File not found in sandbox: docs/testing.rst
+[DEBUG] Reading file from Sandbox: docs/lifecycle.rst
+[WARNING] File not found in sandbox: docs/lifecycle.rst
+[DEBUG] Reading file from Sandbox: docs/quickstart.rst
+[WARNING] File not found in sandbox: docs/quickstart.rst
+[DEBUG] Reading file from Sandbox: src/flask/testing.py
+[WARNING] File not found in sandbox: src/flask/testing.py
+[DEBUG] Reading file from Sandbox: src/flask/sessions.py
+[WARNING] File not found in sandbox: src/flask/sessions.py
+[DEBUG] Reading file from Sandbox: docs/extensiondev.rst
+[WARNING] File not found in sandbox: docs/extensiondev.rst
+[DEBUG] Reading file from Sandbox: docs/errorhandling.rst
+[WARNING] File not found in sandbox: docs/errorhandling.rst
+[DEBUG] Reading file from Sandbox: docs/patterns/celery.rst
+[WARNING] File not found in sandbox: docs/patterns/celery.rst
+--- Running Critic Loop ---
+Semgrep failed: 
+--- Score: 80/100 ---
+[WARNING] Max retries (3) reached, accepting current solution
+--- PR APPROVED (Max Retries Reached) ---
+   ↳ Scorecard saved: reports/scorecard_issue-001_20260115_014800.md
+⌛ Sandbox Time Travel: Returning to main...
+
+═══ SHADOW MODE RESULTS ═══
+Total Tests: 1
+False Omissions: 0
+FOR Percentage: 0.0%
+FOR Safety Score: 100/100
+Detailed results saved to: reports/shadow_results_20260115_014801.json
+--- Shutting Down Agent Tools ---

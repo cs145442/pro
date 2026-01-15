@@ -1,0 +1,74 @@
+Artificial Architect System Initializing...
+⚠️ ANTHROPIC_API_KEY not found - will use OpenAI GPT-4.1 for Brain
+Initializing Agent for: general
+⚠️ Anthropic API key not configured, using OpenAI GPT-4.1
+--- Starting Agent Tools ---
+Sandbox started: 86479eb388
+Running Shadow Mode Evaluation
+Dataset: reports/single_pr_test.json
+Loaded 1 test cases
+
+Testing Case: pr-3166
+--- Orienting on: Document show_envvar in Help Pages... ---
+[DEBUG] State keys: ['issue_id', 'issue_description', 'repo_path', 'retrieved_context', 'known_dependencies', 'plan', 'current_step', 'generated_diff', 'safety_score', 'compliance_score', 'faithfulness_score', 'risk_level', 'risk_score', 'mttr_seconds', 'tokens_used', 'models_used', 'critic_feedback', 'retry_count', 'status']
+[DEBUG] State types: [('issue_id', 'str'), ('issue_description', 'str'), ('repo_path', 'str'), ('retrieved_context', 'list'), ('known_dependencies', 'list'), ('plan', 'list'), ('current_step', 'int'), ('generated_diff', 'NoneType'), ('safety_score', 'int'), ('compliance_score', 'int'), ('faithfulness_score', 'int'), ('risk_level', 'str'), ('risk_score', 'int'), ('mttr_seconds', 'int'), ('tokens_used', 'dict'), ('models_used', 'dict'), ('critic_feedback', 'list'), ('retry_count', 'int'), ('status', 'str')]
+[DEBUG] Zoekt query: Document show_envvar in
+[DEBUG] Zoekt response keys: ['Result']
+[DEBUG] Zoekt returned 2 file objects from Result.Files
+[DEBUG] First file keys: ['FileName', 'Repository', 'Version', 'Language', 'Branches', 'LineMatches', 'Checksum', 'Score']
+[DEBUG] Zoekt returned 2 results
+--- Found 2 files and 0 dependencies ---
+[DEBUG] Returning context_snippets type: <class 'list'>
+--- Architecting Plan ---
+[DEBUG] plan_node received state keys: ['issue_id', 'issue_description', 'repo_path', 'retrieved_context', 'known_dependencies', 'plan', 'current_step', 'generated_diff', 'safety_score', 'compliance_score', 'faithfulness_score', 'risk_level', 'risk_score', 'mttr_seconds', 'tokens_used', 'models_used', 'critic_feedback', 'retry_count', 'status']
+[DEBUG] retrieved_context type: <class 'list'>
+[DEBUG] retrieved_context value: ['File Found: docs/documentation.md', 'File Found: CHANGES.rst']
+[DEBUG] Calling LLM with input_vars keys: ['issue', 'context']
+[DEBUG] LLM responded with content length: 1050
+[DEBUG] tokens before: {'brain': 0, 'critics': 0, 'total': 0}
+[DEBUG] Added 310 tokens
+[DEBUG] Returning plan with 29 steps
+--- Writing Implementation ---
+--- Running Critic Loop ---
+Semgrep failed: 
+--- Score: 80/100 ---
+Safety score 80 < 90 (Attempt 1/3), retrying...
+--- PR REJECTED (Retrying) ---
+--- Architecting Plan ---
+[DEBUG] plan_node received state keys: ['issue_id', 'issue_description', 'repo_path', 'retrieved_context', 'known_dependencies', 'plan', 'current_step', 'generated_diff', 'safety_score', 'compliance_score', 'faithfulness_score', 'risk_level', 'risk_score', 'mttr_seconds', 'tokens_used', 'models_used', 'critic_feedback', 'retry_count', 'status']
+[DEBUG] retrieved_context type: <class 'list'>
+[DEBUG] retrieved_context value: ['File Found: docs/documentation.md', 'File Found: CHANGES.rst']
+[DEBUG] Calling LLM with input_vars keys: ['issue', 'context']
+[DEBUG] LLM responded with content length: 1258
+[DEBUG] tokens before: {'brain': 914, 'critics': 0, 'total': 914}
+[DEBUG] Added 348 tokens
+[DEBUG] Returning plan with 31 steps
+--- Writing Implementation ---
+--- Running Critic Loop ---
+Semgrep failed: 
+--- Score: 80/100 ---
+Safety score 80 < 90 (Attempt 2/3), retrying...
+--- PR REJECTED (Retrying) ---
+--- Architecting Plan ---
+[DEBUG] plan_node received state keys: ['issue_id', 'issue_description', 'repo_path', 'retrieved_context', 'known_dependencies', 'plan', 'current_step', 'generated_diff', 'safety_score', 'compliance_score', 'faithfulness_score', 'risk_level', 'risk_score', 'mttr_seconds', 'tokens_used', 'models_used', 'critic_feedback', 'retry_count', 'status']
+[DEBUG] retrieved_context type: <class 'list'>
+[DEBUG] retrieved_context value: ['File Found: docs/documentation.md', 'File Found: CHANGES.rst']
+[DEBUG] Calling LLM with input_vars keys: ['issue', 'context']
+[DEBUG] LLM responded with content length: 977
+[DEBUG] tokens before: {'brain': 2143, 'critics': 0, 'total': 2143}
+[DEBUG] Added 283 tokens
+[DEBUG] Returning plan with 24 steps
+--- Writing Implementation ---
+--- Running Critic Loop ---
+Semgrep failed: 
+--- Score: 80/100 ---
+[WARNING] Max retries (3) reached, accepting current solution
+--- PR APPROVED (Max Retries Reached) ---
+
+═══ SHADOW MODE RESULTS ═══
+Total Tests: 1
+False Omissions: 0
+FOR Percentage: 0.0%
+FOR Safety Score: 100/100
+Detailed results saved to: reports/shadow_results.json
+--- Shutting Down Agent Tools ---

@@ -1,0 +1,80 @@
+Artificial Architect System Initializing...
+⚠️ ANTHROPIC_API_KEY not found - will use OpenAI GPT-4.1 for Brain
+Initializing Agent for: general
+⚠️ Anthropic API key not configured, using OpenAI GPT-4.1
+--- Starting Agent Tools ---
+Sandbox started: afa7b82f2b
+Running Shadow Mode Evaluation
+Dataset: datasets/flask_pr5818.json
+Loaded 1 test cases
+
+Testing Case: pr-5818
+Traceback (most recent call last):
+  File "/app/src/core/orchestrator.py", line 176, in plan_node
+    response = await chain.ainvoke(input_vars)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/langchain_core/runnables/base.py", line 3191, in ainvoke
+    input_ = await coro_with_context(part(), context, create_task=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/langchain_core/language_models/chat_models.py", line 425, in ainvoke
+    llm_result = await self.agenerate_prompt(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/langchain_core/language_models/chat_models.py", line 1132, in agenerate_prompt
+    return await self.agenerate(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/langchain_core/language_models/chat_models.py", line 1090, in agenerate
+    raise exceptions[0]
+  File "/usr/local/lib/python3.11/site-packages/langchain_core/language_models/chat_models.py", line 1359, in _agenerate_with_cache
+    result = await self._agenerate(
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/langchain_openai/chat_models/base.py", line 1634, in _agenerate
+    raise e
+  File "/usr/local/lib/python3.11/site-packages/langchain_openai/chat_models/base.py", line 1627, in _agenerate
+    raw_response = await self.async_client.with_raw_response.create(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/openai/_legacy_response.py", line 381, in wrapped
+    return cast(LegacyAPIResponse[R], await func(*args, **kwargs))
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 2678, in create
+    return await self._post(
+           ^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/openai/_base_client.py", line 1797, in post
+    return await self.request(cast_to, opts, stream=stream, stream_cls=stream_cls)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/openai/_base_client.py", line 1597, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Incorrect API key provided: sk-svcac***********************************************************************************************************************************************************KwEA. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'code': 'invalid_api_key', 'param': None}, 'status': 401}
+⌛ Sandbox Time Travel: Checking out e7e5380...
+--- Orienting on: pass context through dispatch methods
+
+The current... ---
+[DEBUG] State keys: ['issue_id', 'issue_description', 'repo_path', 'retrieved_context', 'known_dependencies', 'plan', 'current_step', 'generated_diff', 'safety_score', 'compliance_score', 'faithfulness_score', 'risk_level', 'risk_score', 'mttr_seconds', 'tokens_used', 'models_used', 'critic_feedback', 'retry_count', 'status']
+[DEBUG] State types: [('issue_id', 'str'), ('issue_description', 'str'), ('repo_path', 'str'), ('retrieved_context', 'list'), ('known_dependencies', 'list'), ('plan', 'list'), ('current_step', 'int'), ('generated_diff', 'NoneType'), ('safety_score', 'int'), ('compliance_score', 'int'), ('faithfulness_score', 'int'), ('risk_level', 'str'), ('risk_score', 'int'), ('mttr_seconds', 'int'), ('tokens_used', 'dict'), ('models_used', 'dict'), ('critic_feedback', 'list'), ('retry_count', 'int'), ('status', 'str')]
+[DEBUG] Zoekt query: pass context through
+[DEBUG] Zoekt response keys: ['Result']
+[DEBUG] Zoekt returned 14 file objects from Result.Files
+[DEBUG] First file keys: ['FileName', 'Repository', 'Version', 'Language', 'Branches', 'LineMatches', 'Checksum', 'Score']
+[DEBUG] Zoekt returned 14 results
+--- Found 28 files and 0 dependencies ---
+[DEBUG] Returning context_snippets type: <class 'list'>
+--- Architecting Plan ---
+[DEBUG] plan_node received state keys: ['issue_id', 'issue_description', 'repo_path', 'retrieved_context', 'known_dependencies', 'plan', 'current_step', 'generated_diff', 'safety_score', 'compliance_score', 'faithfulness_score', 'risk_level', 'risk_score', 'mttr_seconds', 'tokens_used', 'models_used', 'critic_feedback', 'retry_count', 'status']
+[DEBUG] retrieved_context type: <class 'list'>
+[DEBUG] retrieved_context value: ['File Found: src/click/core.py', 'File Found: src/click/core.py', 'File Found: CHANGES.rst', 'File Found: CHANGES.rst', 'File Found: docs/utils.md', 'File Found: docs/utils.md', 'File Found: docs/prompts.md', 'File Found: docs/prompts.md', 'File Found: docs/advanced.md', 'File Found: docs/advanced.md', 'File Found: docs/commands.rst', 'File Found: docs/commands.rst', 'File Found: docs/exceptions.md', 'File Found: docs/exceptions.md', 'File Found: src/click/termui.py', 'File Found: src/click/termui.py', 'File Found: src/click/parser.py', 'File Found: src/click/parser.py', 'File Found: docs/shell-completion.md', 'File Found: docs/shell-completion.md', 'File Found: src/click/_termui_impl.py', 'File Found: src/click/_termui_impl.py', 'File Found: docs/commands-and-groups.rst', 'File Found: docs/commands-and-groups.rst', 'File Found: tests/test_utils.py', 'File Found: tests/test_utils.py', 'File Found: tests/test_commands.py', 'File Found: tests/test_commands.py']
+[DEBUG] Calling LLM with input_vars keys: ['issue', 'context']
+[ERROR] plan_node failed: Error code: 401 - {'error': {'message': 'Incorrect API key provided: sk-svcac***********************************************************************************************************************************************************KwEA. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'code': 'invalid_api_key', 'param': None}, 'status': 401}
+Error: Error code: 401 - {'error': {'message': 'Incorrect API key provided: 
+sk-svcac************************************************************************
+********************************************************************************
+***KwEA. You can find your API key at 
+https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error',
+'code': 'invalid_api_key', 'param': None}, 'status': 401}
+⌛ Sandbox Time Travel: Returning to main...
+
+═══ SHADOW MODE RESULTS ═══
+Total Tests: 1
+False Omissions: 0
+FOR Percentage: 0.0%
+FOR Safety Score: 100/100
+Detailed results saved to: reports/shadow_results_20260115_013030.json
+--- Shutting Down Agent Tools ---
