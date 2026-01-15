@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+# Keep .env.example
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Project Specific - Runtime Data
+
+
+# Cloned Repositories (WorldBuilder output)
+repos/
+
+# Search Index Data (Zoekt output)
+index-data/
+
+# Database Data (Neo4j/GraphRAG)
+data/
+
+# Evaluation Reports (Generated Artifacts)
+
+
+# Temporary Files created by Agent
+temp_patch.java
+temp_patch.*
+*.diff
+
+# Temporary directories
+tmp/
+temp/
+for_validation_*/
+
+# OS specific
+.DS_Store
+Thumbs.db

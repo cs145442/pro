@@ -1,0 +1,52 @@
+FROM python:3.11-slim-bookworm
+
+# Install system dependencies and tools
+# We install:
+# - Common tools: git, curl, build-essential
+# - Java: OpenJDK 17, Maven
+# - Node.js: via setup_20.x script
+# - Go: via download
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    curl \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    openjdk-17-jdk \
+    maven \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Gradle
+ENV GRADLE_VERSION=8.5
+RUN curl -L "https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip" -o gradle.zip \
+    && apt-get update && apt-get install -y unzip \
+    && unzip gradle.zip -d /opt \
+    && ln -s /opt/gradle-${GRADLE_VERSION}/bin/gradle /usr/local/bin/gradle \
+    && rm gradle.zip
+
+# Install Node.js (LTS)
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs
+
+# Install Go
+ENV GO_VERSION=1.21.6
+RUN curl -L "https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz" -o go.tar.gz \
+    && tar -C /usr/local -xzf go.tar.gz \
+    && rm go.tar.gz
+ENV PATH=$PATH:/usr/local/go/bin
+
+# Install Python testing tools
+# Note: pytest is essential for the Python runs
+RUN pip install pytest pytest-cov
+
+# Set working directory
+WORKDIR /workspace
+
+# Default command (idle)
+CMD ["tail", "-f", "/dev/null"]

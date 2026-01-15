@@ -1,0 +1,69 @@
+services:
+  # 1. THE BRAIN (The Agent Logic we just wrote)
+  # This container runs the python code (main.py)
+  agent-brain:
+    build: .
+    env_file: .env
+    volumes:
+      - ./src:/app/src # Hot reload code
+      - ./repos:/app/repos # Shared repos for indexing
+      - ./reports:/app/reports # Persist reports
+      - ./logs:/app/logs # Persist logs
+      - ./data:/data # Persist metrics database (TDR tracking)
+      - ./datasets:/app/datasets # Shared datasets
+      - /var/run/docker.sock:/var/run/docker.sock # Allow brain to spawn sandboxes
+    depends_on:
+      - neo4j
+      - zoekt-index
+    environment:
+      - NEO4J_URI=bolt://neo4j:7687
+      - ZOEKT_URL=http://zoekt-web:6070
+      - TARGET_REPO=${TARGET_REPO}
+
+  # 2. THE PERCEPTION LAYER (Neo4j Graph DB)
+  # Stores the dependency graph.
+  neo4j:
+    image: neo4j:5.15.0
+    ports:
+      - "7474:7474" # HTTP
+      - "7687:7687" # Bolt
+    environment:
+      - NEO4J_AUTH=neo4j/password
+    volumes:
+      - neo4j_data:/data
+
+  # 3. THE EYES (Zoekt Code Search)
+  # Indexes the code for instant regex search.
+  zoekt-index:
+    image: sourcegraph/zoekt-indexserver:latest
+    container_name: zoekt-index
+    volumes:
+      - ./repos:/data/repos
+      - ./index-data:/data/index
+    # command: /bin/sh -c "while true; do sleep 3600; done" # Optional, or just let it run
+
+  agent-sandbox:
+    build:
+      context: .
+      dockerfile: Dockerfile.sandbox
+    image: agent-sandbox:latest
+    container_name: pro-agent-sandbox
+    volumes:
+      - ./repos:/workspace/repos # Access to cloned repos
+      - .:/app # Access to source code (OPTIONAL, technically sandbox should be isolated)
+    # We DO NOT mount the main app code into /workspace usually, but for "time travel" 
+    # the agent copies code FROM repos TO the workspace.
+    # For now, we will simply keep it running.
+    entrypoint: [ "tail", "-f", "/dev/null" ]
+
+  zoekt-web:
+    image: sourcegraph/zoekt-webserver:latest
+    container_name: zoekt-web
+    ports:
+      - "6070:6070"
+    volumes:
+      - ./index-data:/data/index
+    # Removing command to let the container use its default entrypoint
+
+volumes:
+  neo4j_data:

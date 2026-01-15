@@ -1,0 +1,17 @@
+# Core AI
+langchain
+langchain-openai
+langchain-anthropic
+langchain-community
+langgraph
+tiktoken
+
+# Tools
+neo4j
+semgrep
+docker>=7.0.0
+
+# Infrastructure
+requests>=2.31.0
+rich>=13.0.0
+python-dotenv>=1.0.0
