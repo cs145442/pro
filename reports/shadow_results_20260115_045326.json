@@ -1,0 +1,23 @@
+[
+  {
+    "issue_id": "pr-5818",
+    "known_bug": false,
+    "agent_approved": false,
+    "false_omission": false,
+    "details": "Error code: 429 - {'error': {'message': 'Request too large for gpt-4.1 in organization org-wZy7CVgQyjOxTV3itAd4IIee on tokens per min (TPM): Limit 30000, Requested 107350. The input or output tokens must be reduced in order to run successfully. Visit https://platform.openai.com/account/rate-limits to learn more.', 'type': 'tokens', 'param': None, 'code': 'rate_limit_exceeded'}}"
+  },
+  {
+    "issue_id": "pr-5829",
+    "known_bug": true,
+    "agent_approved": true,
+    "false_omission": true,
+    "details": "Score: 100 | Report: reports/scorecard_issue-001_20260115_045259.md"
+  },
+  {
+    "issue_id": "pr-5812",
+    "known_bug": false,
+    "agent_approved": false,
+    "false_omission": false,
+    "details": "Error code: 429 - {'error': {'message': 'Request too large for gpt-4.1 in organization org-wZy7CVgQyjOxTV3itAd4IIee on tokens per min (TPM): Limit 30000, Requested 46811. The input or output tokens must be reduced in order to run successfully. Visit https://platform.openai.com/account/rate-limits to learn more.', 'type': 'tokens', 'param': None, 'code': 'rate_limit_exceeded'}}"
+  }
+]

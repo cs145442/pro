@@ -1,0 +1,9 @@
+[
+  {
+    "issue_id": "pr-5818",
+    "known_bug": false,
+    "agent_approved": false,
+    "false_omission": false,
+    "details": "name 'cmd' is not defined"
+  }
+]

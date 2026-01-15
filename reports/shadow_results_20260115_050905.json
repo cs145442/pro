@@ -1,0 +1,23 @@
+[
+  {
+    "issue_id": "pr-5818",
+    "known_bug": false,
+    "agent_approved": true,
+    "false_omission": false,
+    "details": "Score: 100 | Report: reports/scorecard_issue-001_20260115_050758.md"
+  },
+  {
+    "issue_id": "pr-5829",
+    "known_bug": true,
+    "agent_approved": true,
+    "false_omission": true,
+    "details": "Score: 100 | Report: reports/scorecard_issue-001_20260115_050818.md"
+  },
+  {
+    "issue_id": "pr-5812",
+    "known_bug": false,
+    "agent_approved": true,
+    "false_omission": false,
+    "details": "Score: 100 | Report: reports/scorecard_issue-001_20260115_050905.md"
+  }
+]
