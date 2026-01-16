@@ -1,5 +1,8 @@
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
+import logging
+
+logger = logging.getLogger(__name__)
 
 class ComplianceCritic:
     """
@@ -15,5 +18,7 @@ class ComplianceCritic:
 
     async def review(self, diff: str) -> str:
         chain = self.prompt | self.llm
+        logger.debug(f"[Compliance] Reviewing diff length: {len(diff)}")
         response = await chain.ainvoke({"diff": diff})
+        logger.info(f"⚖️ [COMPLIANCE] Model output:\n{response.content}\n--------------------------------------------------")
         return response.content

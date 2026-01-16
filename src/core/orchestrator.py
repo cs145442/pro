@@ -18,6 +18,9 @@ from src.core.tool_tracker import ToolUsageTracker  # NEW: Priority 3
 from src.metric.technical_debt_tracker import TechnicalDebtTracker  # NEW: Priority 3
 from src.config.agent_config import AgentConfig
 import os
+import logging
+
+logger = logging.getLogger(__name__)
 
 class AgentOrchestrator:
     def __init__(self, repo_type="aosp"):
@@ -30,15 +33,15 @@ class AgentOrchestrator:
                 self.llm = ChatAnthropic(model=AgentConfig.BRAIN_MODEL, temperature=0)
                 self.brain_model = AgentConfig.BRAIN_MODEL
                 self.brain_provider = "anthropic"
-                print(f"🧠 Brain: Using {self.brain_model} (Anthropic)")
+                logger.info(f"🧠 Brain: Using {self.brain_model} (Anthropic)")
             except Exception as e:
-                print(f"⚠️ Anthropic init failed ({e}), falling back to {AgentConfig.FALLBACK_MODEL}")
+                logger.warning(f"⚠️ Anthropic init failed ({e}), falling back to {AgentConfig.FALLBACK_MODEL}")
                 from langchain_openai import ChatOpenAI
                 self.llm = ChatOpenAI(model=AgentConfig.FALLBACK_MODEL, temperature=0)
                 self.brain_model = AgentConfig.FALLBACK_MODEL
                 self.brain_provider = "openai"
         else:
-            print(f"⚠️ Anthropic API key not configured, using {AgentConfig.FALLBACK_MODEL}")
+            logger.warning(f"⚠️ Anthropic API key not configured, using {AgentConfig.FALLBACK_MODEL}")
             from langchain_openai import ChatOpenAI
             self.llm = ChatOpenAI(model=AgentConfig.FALLBACK_MODEL, temperature=0)
             self.brain_model = AgentConfig.FALLBACK_MODEL
@@ -134,10 +137,10 @@ class AgentOrchestrator:
         
         try:
             llm = _get_llm(primary_model, temperature)
-            print(f"🧠 [{node_name}] Using {primary_model}")
+            logger.info(f"🧠 [{node_name}] Using {primary_model}")
             return llm
         except Exception as e:
-            print(f"⚠️ [{node_name}] {primary_model} failed ({e}), using fallback {fallback_model}")
+            logger.warning(f"⚠️ [{node_name}] {primary_model} failed ({e}), using fallback {fallback_model}")
             return _get_llm(fallback_model, temperature)
 
 
@@ -169,7 +172,7 @@ class AgentOrchestrator:
             # PRE-FLIGHT CHECK: Verify Repo Exists on Disk
             repo_disk_path = f"repos/{target_repo_name}"
             if target_repo_name and not os.path.exists(repo_disk_path):
-                 print(f"[WARNING] Repo folder '{repo_disk_path}' missing. Triggering Auto-Indexing...")
+                 logger.warning(f"[WARNING] Repo folder '{repo_disk_path}' missing. Triggering Auto-Indexing...")
                  from src.tools.world_builder import WorldBuilder
                  wb = WorldBuilder()
                  wb.setup_world(target_repo_url)
@@ -179,9 +182,9 @@ class AgentOrchestrator:
             # Add repo filter constraint
             query = f"{query_terms} repo:{target_repo_name}" if target_repo_name else query_terms
             
-            print(f"[DEBUG] Zoekt query: {query}")
+            logger.debug(f"[DEBUG] Zoekt query: {query}")
             results = self.zoekt.search(query, num_results=5)
-            print(f"[DEBUG] Zoekt returned {len(results)} results")
+            logger.debug(f"[DEBUG] Zoekt returned {len(results)} results")
             
             context_snippets = []
             files_found = []
@@ -192,7 +195,7 @@ class AgentOrchestrator:
                 elif isinstance(r, dict):
                     path = r.get("FileName", r.get("Name", "unknown"))
                 else:
-                    print(f"[WARNING] Unexpected result type: {type(r)}")
+                    logger.warning(f"[WARNING] Unexpected result type: {type(r)}")
                     continue
                     
                 context_snippets.append(f"File Found: {path}")
@@ -200,7 +203,7 @@ class AgentOrchestrator:
 
             # 1.5. Auto-Healing: Fallback if search still fails (e.g. index corruption)
             if not files_found and target_repo_name:
-                 print("[WARNING] No files found in index even after pre-check. Re-triggering indexing just in case.")
+                 logger.warning("[WARNING] No files found in index even after pre-check. Re-triggering indexing just in case.")
                  target_repo = os.getenv("TARGET_REPO")
                  if not target_repo:
                      raise ValueError("TARGET_REPO env var not set! Cannot auto-index.")
@@ -210,7 +213,7 @@ class AgentOrchestrator:
                  wb.setup_world(target_repo)
                  
                  # Retry Search
-                 print("[INFO] Indexing complete. Retrying search...")
+                 logger.info("[INFO] Indexing complete. Retrying search...")
                  results = self.zoekt.search(query, num_results=3)
                  for r in results:
                      if isinstance(r, dict):
@@ -221,21 +224,21 @@ class AgentOrchestrator:
             # 1.5. Build Semantic Graph (GraphRAG)
             try:
                 from src.perception.graph_builder import GraphBuilder
-                print("[GraphRAG] Building semantic graph...")
+                logger.info("[GraphRAG] Building semantic graph...")
                 
                 # Map Sandbox Path (/workspace/repos) to Brain Path (/app/repos)
                 # The agent-brain container mounts ./repos to /app/repos
                 repo_path_brain = state['repo_path'].replace("/workspace/repos", "/app/repos")
                 
                 if not os.path.exists(repo_path_brain):
-                     print(f"[GraphRAG] Warning: Brain path {repo_path_brain} does not exist. Using original {state['repo_path']}")
+                     logger.warning(f"[GraphRAG] Warning: Brain path {repo_path_brain} does not exist. Using original {state['repo_path']}")
                      repo_path_brain = state['repo_path']
                 
                 gb = GraphBuilder(uri=os.getenv("NEO4J_URI"), user=os.getenv("NEO4J_USERNAME"), password=os.getenv("NEO4J_PASSWORD"))
                 gb.build_graph(repo_path_brain)
                 gb.close()
             except Exception as e:
-                print(f"[ERROR] GraphBuilder failed: {e}")
+                logger.error(f"[ERROR] GraphBuilder failed: {e}")
             
             # 2. Graph Retrieval (Semantic Dependency Analysis)
             dependencies = []
@@ -258,7 +261,7 @@ class AgentOrchestrator:
                  except:
                      pass
             
-            print(f"[GraphRAG] Analyzing impact for symbols: {list(potential_symbols)[:5]}...")
+            logger.info(f"[GraphRAG] Analyzing impact for symbols: {list(potential_symbols)[:5]}...")
             
             # Triple-Layer Dependency Analysis
             for symbol in potential_symbols:
@@ -267,7 +270,7 @@ class AgentOrchestrator:
                 # Layer 1: Direct function calls (func())
                 direct_callers = self.graph_rag.get_callers(symbol)
                 if direct_callers:
-                    print(f"[GraphRAG Layer 1] Direct callers of {symbol}: {direct_callers}")
+                    logger.debug(f"[GraphRAG Layer 1] Direct callers of {symbol}: {direct_callers}")
                     dependent_files.update(direct_callers)
                 
                 # Layer 2: Attribute-based calls (self.method(), obj.method())
@@ -281,10 +284,10 @@ class AgentOrchestrator:
                     zoekt_results = self.zoekt.search(symbol, num_results=10)
                     zoekt_files = [r.get('FileName', r.get('Name')) for r in zoekt_results if isinstance(r, dict)]
                     if zoekt_files:
-                        print(f"[GraphRAG Layer 3] Zoekt matches for {symbol}: {len(zoekt_files)} files")
+                        logger.debug(f"[GraphRAG Layer 3] Zoekt matches for {symbol}: {len(zoekt_files)} files")
                         dependent_files.update(zoekt_files)
                 except Exception as e:
-                    print(f"[GraphRAG Layer 3] Zoekt search failed: {e}")
+                    logger.warning(f"[GraphRAG Layer 3] Zoekt search failed: {e}")
                 
                 # Add all discovered dependencies to context
                 for dep_file in dependent_files:
@@ -300,11 +303,11 @@ class AgentOrchestrator:
                     dependencies.extend(deps)
                     context_snippets.append(f"⚠️ Dependency Warning: Modifying {f} may break {deps}")
 
-            print(f"--- Found {len(files_found)} files and {len(dependencies)} dependencies ---")
-            print(f"[DEBUG] Returning context_snippets type: {type(context_snippets)}")
+            logger.info(f"--- Found {len(files_found)} files and {len(dependencies)} dependencies ---")
+            logger.debug(f"[DEBUG] Returning context_snippets type: {type(context_snippets)}")
             return {"retrieved_context": context_snippets, "known_dependencies": dependencies}
         except Exception as e:
-            print(f"[ERROR] orient_node failed: {e}")
+            logger.error(f"[ERROR] orient_node failed: {e}")
             import traceback
             traceback.print_exc()
             raise
@@ -313,9 +316,9 @@ class AgentOrchestrator:
     async def plan_node(self, state: AgentState):
         """Phase 2: Generate Plan using LLM."""
         try:
-            print("--- Architecting Plan ---")
-            print(f"[DEBUG] plan_node received state keys: {list(state.keys())}")
-            print(f"[DEBUG] retrieved_context type: {type(state.get('retrieved_context'))}")
+            logger.info("--- Architecting Plan ---")
+            logger.debug(f"[DEBUG] plan_node received state keys: {list(state.keys())}")
+            logger.debug(f"[DEBUG] retrieved_context type: {type(state.get('retrieved_context'))}")
             
             # Use reasoning model (o3-mini) for planning
             llm = self._get_llm_for_node("plan")
@@ -323,40 +326,41 @@ class AgentOrchestrator:
             
             context_list = state.get('retrieved_context', [])
             if isinstance(context_list, str):
-                print(f"[WARNING] retrieved_context is a string, converting to list")
+                logger.warning(f"[WARNING] retrieved_context is a string, converting to list")
                 context_list = [context_list]
             
             input_vars = {
                 "issue": state['issue_description'],
                 "context": "\n".join(context_list)
             }
-            print(f"[DEBUG] Calling LLM with input_vars keys: {list(input_vars.keys())}")
+            logger.debug(f"[DEBUG] Calling LLM with input_vars keys: {list(input_vars.keys())}")
             
             response = await chain.ainvoke(input_vars)
-            print(f"[DEBUG] LLM responded with content length: {len(response.content)}")
+            logger.debug(f"[DEBUG] LLM responded with content length: {len(response.content)}")
+            logger.info(f"🧠 [PLANNING] Model output:\n{response.content}\n--------------------------------------------------")
             plan_steps = response.content.split("\n")
             
             # Track token usage
             tokens = state.get('tokens_used', {"brain": 0, "critics": 0, "total": 0})
-            print(f"[DEBUG] tokens before: {tokens}")
+            logger.debug(f"[DEBUG] tokens before: {tokens}")
             if hasattr(response, 'usage_metadata') and response.usage_metadata:
                 tokens_in = response.usage_metadata.get('input_tokens', 0)
                 tokens_out = response.usage_metadata.get('output_tokens', 0)
                 tokens['brain'] += tokens_in + tokens_out
                 tokens['total'] += tokens_in + tokens_out
-                print(f"[DEBUG] Added {tokens_in + tokens_out} tokens")
+                logger.debug(f"[DEBUG] Added {tokens_in + tokens_out} tokens")
             
-            print(f"[DEBUG] Returning plan with {len(plan_steps)} steps")
+            logger.info(f"[DEBUG] Returning plan with {len(plan_steps)} steps")
             return {"plan": plan_steps, "tokens_used": tokens}
         except Exception as e:
-            print(f"[ERROR] plan_node failed: {e}")
+            logger.error(f"[ERROR] plan_node failed: {e}")
             import traceback
             traceback.print_exc()
             raise
 
     async def code_node(self, state: AgentState):
         """Phase 3: Write Code using LLM with Self-Correction Loop."""
-        print("--- Writing Implementation ---")
+        logger.info("--- Writing Implementation ---")
         
         max_retries = 3
         self_correction_attempts = 0
@@ -368,14 +372,21 @@ class AgentOrchestrator:
             file_contents = ""
             files_to_read = state.get('retrieved_context', [])
             
+            MAX_FILES_TO_READ = 30
+            read_count = 0
             for item in files_to_read:
+                if read_count >= MAX_FILES_TO_READ:
+                    logger.warning(f"[WARNING] Reached max file read limit ({MAX_FILES_TO_READ}). Skipping remaining files.")
+                    break
+                    
                 if "File Found: " in item:
                     file_path = item.split("File Found: ")[1].strip()
                     try:
-                        print(f"[DEBUG] Reading file from Sandbox: {file_path} (cwd={state['repo_path']})")
+                        read_count += 1
+                        logger.info(f"[INFO] Reading file {read_count}/{len(files_to_read)}: {file_path}")
                         content = self.sandbox.execute_command(f"cat {file_path}", workdir=state['repo_path'])
                         if "cat: " in content and "No such file" in content:
-                            print(f"[WARNING] File not found in sandbox: {file_path}")
+                            logger.warning(f"[WARNING] File not found in sandbox: {file_path}")
                             continue
                             
                         # Limit output to prevent context overflow
@@ -385,7 +396,7 @@ class AgentOrchestrator:
                         
                         file_contents += f"\n\n--- {file_path} ---\n{content}\n"
                     except Exception as e:
-                        print(f"[ERROR] Failed to read {file_path}: {e}")
+                        logger.error(f"[ERROR] Failed to read {file_path}: {e}")
                         file_contents += f"\n(Could not read {file_path}: {e})"
 
             # 2. Build prompt with error context
@@ -420,7 +431,7 @@ INSTRUCTIONS FOR THIS RETRY:
             
             if attempt > 0 and retry_temperature > 0:
                 # Create new LLM instance with higher temperature for this retry
-                print(f"[Self-Correction] Using temperature={retry_temperature} for retry #{attempt}")
+                logger.info(f"[Self-Correction] Using temperature={retry_temperature} for retry #{attempt}")
                 if self.brain_provider == "openai":
                     from langchain_openai import ChatOpenAI
                     retry_llm = ChatOpenAI(model=AgentConfig.NODE_MODELS["code"]["primary"], temperature=retry_temperature)
@@ -438,6 +449,7 @@ INSTRUCTIONS FOR THIS RETRY:
             }
             response = await chain.ainvoke(input_vars)
             diff = response.content
+            logger.info(f"✍️ [CODE] Model output (Diff):\n{diff}\n--------------------------------------------------")
             
             # Clean diff (strip markdown fences if present)
             if diff.startswith("```"):
@@ -460,7 +472,7 @@ INSTRUCTIONS FOR THIS RETRY:
             is_valid, error = await self._validate_syntax_in_sandbox(diff, state['repo_path'])
             
             if is_valid:
-                print(f"[Self-Correction] Validation passed on attempt {attempt + 1}")
+                logger.info(f"[Self-Correction] Validation passed on attempt {attempt + 1}")
                 return {
                     "generated_diff": diff, 
                     "tokens_used": tokens,
@@ -477,10 +489,10 @@ INSTRUCTIONS FOR THIS RETRY:
                 failed_file = error.split("Error in ")[1].split(":")[0].strip()
                 failed_files.add(failed_file)
             
-            print(f"[Self-Correction] Attempt {attempt + 1} failed validation: {error}")
+            logger.warning(f"[Self-Correction] Attempt {attempt + 1} failed validation: {error}")
         
         # After max retries, return best effort (let critic catch it)
-        print(f"[Self-Correction] Max retries ({max_retries}) exhausted. Returning best effort.")
+        logger.warning(f"[Self-Correction] Max retries ({max_retries}) exhausted. Returning best effort.")
         return {
             "generated_diff": diff, 
             "tokens_used": tokens,
@@ -490,7 +502,7 @@ INSTRUCTIONS FOR THIS RETRY:
 
     async def critic_node(self, state: AgentState):
         """Phase 4: Safety & Compliance Check."""
-        print("--- Running Critic Loop ---")
+        logger.info("--- Running Critic Loop ---")
         
         diff = state['generated_diff']
         
@@ -532,7 +544,15 @@ INSTRUCTIONS FOR THIS RETRY:
         # Ensure score is in valid range
         compliance_score = max(0, min(100, compliance_score))
         
-        print(f"--- Scores: Safety={safety_score}/100, Compliance={compliance_score}/100 ---")
+        logger.info(f"--- Scores: Safety={safety_score}/100, Compliance={compliance_score}/100 ---")
+        
+        # 3.5. Risk Calibration (Financial Paradigm)
+        try:
+            risk_level, risk_score, risk_reason = await self.risk_calibrator.classify_risk(state['issue_description'])
+            logger.info(f"--- Risk: {risk_level} ({risk_score}/10) - {risk_reason} ---")
+        except Exception as e:
+            logger.error(f"Risk calibration failed: {e}")
+            risk_level, risk_score, risk_reason = "MEDIUM", 5, "Failed"
         
         # 4. FOR Validation (NEW: Priority 1)
         language = self._detect_language(state['repo_path'])
@@ -544,7 +564,7 @@ INSTRUCTIONS FOR THIS RETRY:
         )
         for_score = for_result['for_score']
         tests_broken = for_result['tests_broken']
-        print(f"--- FOR: {for_score}/100 (Tests broken: {tests_broken}) ---")
+        logger.info(f"--- FOR: {for_score}/100 (Tests broken: {tests_broken}) ---")
         
         # 5. Specification Gaming Detection (NEW: Priority 1)
         spec_gaming_result = self.spec_gaming.detect_gaming(
@@ -553,7 +573,7 @@ INSTRUCTIONS FOR THIS RETRY:
         )
         spec_gaming_index = spec_gaming_result['index']
         test_files_modified = spec_gaming_result['test_modified']
-        print(f"--- Spec Gaming Index: {spec_gaming_index}/100 ---")
+        logger.info(f"--- Spec Gaming Index: {spec_gaming_index}/100 ---")
         
         # 6. Prompt Injection Resistance (NEW: Priority 1)
         pirr_result = self.pirr_tester.check_resistance(
@@ -562,7 +582,7 @@ INSTRUCTIONS FOR THIS RETRY:
         )
         pirr_score = pirr_result['score']
         poisoned_detected = pirr_result['was_poisoned']
-        print(f"--- PIRR: {pirr_score}/100 (Poisoned: {poisoned_detected}) ---")
+        logger.info(f"--- PIRR: {pirr_score}/100 (Poisoned: {poisoned_detected}) ---")
         
         # 7. Code Quality Analysis (NEW: Priority 2)
         language = self._detect_language(state['repo_path'])
@@ -575,12 +595,12 @@ INSTRUCTIONS FOR THIS RETRY:
         dup_ratio = quality_result['duplication_ratio']
         avr_count = quality_result['architectural_violations']
         coupling = quality_result['coupling_score']
-        print(f"--- Code Quality: MI={mi_score}/100, CC={cc_average:.1f}, Dup={dup_ratio:.1f}%, AVR={avr_count}, Coupling={coupling}/100 ---")
+        logger.info(f"--- Code Quality: MI={mi_score}/100, CC={cc_average:.1f}, Dup={dup_ratio:.1f}%, AVR={avr_count}, Coupling={coupling}/100 ---")
         
         # 8. Tool Use Success Rate (NEW: Priority 3)
         tusr_data = self.tool_tracker.calculate_tusr()
         tusr_score = tusr_data['tusr']
-        print(f"--- TUSR: {tusr_score}/100 (Total tools: {tusr_data['total']}, Failed: {tusr_data['failed']}) ---")
+        logger.info(f"--- TUSR: {tusr_score}/100 (Total tools: {tusr_data['total']}, Failed: {tusr_data['failed']}) ---")
         
         # 9. Technical Debt Ratio (NEW: Priority 3)
         work_type = self.tdr_tracker.classify_work_type(
@@ -589,13 +609,14 @@ INSTRUCTIONS FOR THIS RETRY:
             plan=state.get('plan', [])
         )
         tdr_data = self.tdr_tracker.calculate_tdr()
-        print(f"--- TDR: {tdr_data['tdr_ratio']:.1f}% ({work_type} work) ---")
+        logger.info(f"--- TDR: {tdr_data['tdr_ratio']:.1f}% ({work_type} work) ---")
         
         # Increment retry count
         retry_count = state.get('retry_count', 0) + 1
         
         # Combine all feedback
         all_feedback = safety_issues + [compliance_feedback]
+        all_feedback.append(f"Risk: {risk_level} ({risk_score}/10)")
         if for_result['details']:
             all_feedback.append(f"FOR: {for_result['details']}")
         if spec_gaming_result['violations']:
@@ -626,17 +647,19 @@ INSTRUCTIONS FOR THIS RETRY:
             "tdr_ratio": tdr_data['tdr_ratio'],
             "work_type": work_type,
             "historical_tdr": tdr_data['tdr_ratio'],  # Same for single run
+            "risk_level": risk_level,
+            "risk_score": risk_score,
             "critic_feedback": all_feedback,
             "retry_count": retry_count
         }
 
     async def startup(self):
         """Initialize external tool connections."""
-        print("--- Starting Agent Tools ---")
+        logger.info("--- Starting Agent Tools ---")
         try:
             self.sandbox.start()
         except Exception as e:
-            print(f"Warning: Sandbox failed to start ({e}). Running in mocked I/O mode.")
+            logger.warning(f"Warning: Sandbox failed to start ({e}). Running in mocked I/O mode.")
 
     def check_review(self, state: AgentState):
         """Decide if code passes or needs revision."""
@@ -644,17 +667,17 @@ INSTRUCTIONS FOR THIS RETRY:
         retry_count = state.get('retry_count', 0)
         
         if retry_count >= MAX_RETRIES:
-            print(f"[WARNING] Max retries ({MAX_RETRIES}) reached, accepting current solution")
-            print("--- PR APPROVED (Max Retries Reached) ---")
+            logger.warning(f"[WARNING] Max retries ({MAX_RETRIES}) reached, accepting current solution")
+            logger.info("--- PR APPROVED (Max Retries Reached) ---")
             return "approved"
 
         # Check safety score
         if state.get('safety_score', 0) >= AgentConfig.SAFETY_THRESHOLD:
-            print("--- PR APPROVED ---")
+            logger.info("--- PR APPROVED ---")
             return "approved"
         else:
-            print(f"Safety score {state.get('safety_score')} < {AgentConfig.SAFETY_THRESHOLD} (Attempt {retry_count}/{MAX_RETRIES}), retrying...")
-            print("--- PR REJECTED (Retrying) ---")
+            logger.warning(f"Safety score {state.get('safety_score')} < {AgentConfig.SAFETY_THRESHOLD} (Attempt {retry_count}/{MAX_RETRIES}), retrying...")
+            logger.info("--- PR REJECTED (Retrying) ---")
             return "rejected"
             
 
@@ -670,7 +693,7 @@ INSTRUCTIONS FOR THIS RETRY:
         4. Quick Smoke Test (run 1 fast test to catch runtime errors)
         """
         try:
-            print("[Self-Correction] Validating generated code...")
+            logger.info("[Self-Correction] Validating generated code...")
             
             # Extract modified files from the diff using multiple patterns
             import re
@@ -705,11 +728,11 @@ INSTRUCTIONS FOR THIS RETRY:
                         modified_files.add('src/flask/ctx.py')
             
             if not modified_files:
-                print("[Self-Correction] Warning: No files detected in diff. Assuming src/flask/app.py")
+                logger.warning("[Self-Correction] Warning: No files detected in diff. Assuming src/flask/app.py")
                 # Default to the most common file for Flask tasks
                 modified_files.add('src/flask/app.py')
             
-            print(f"[Self-Correction] Detected modified files: {modified_files}")
+            logger.info(f"[Self-Correction] Detected modified files: {modified_files}")
             
             # Apply the patch
             sandbox = self.sandbox

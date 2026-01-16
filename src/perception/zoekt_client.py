@@ -9,6 +9,8 @@ class ZoektClient:
     """
     def __init__(self, base_url=None):
         self.base_url = base_url or os.getenv("ZOEKT_URL", "http://localhost:6070")
+        import logging
+        self.logger = logging.getLogger(__name__)
 
     def search(self, query: str, num_results=10) -> List[Dict]:
         """
@@ -25,7 +27,7 @@ class ZoektClient:
             data = resp.json()
             
             # Debug: Print response structure
-            print(f"[DEBUG] Zoekt response keys: {list(data.keys())}")
+            self.logger.debug(f"Zoekt response keys: {list(data.keys())}")
             
             # Zoe kt response structure: {"Result": {"Files": [...], "Stats": {...}}}
             result = data.get("Result", {})
@@ -33,21 +35,22 @@ class ZoektClient:
             if isinstance(result, dict):
                 # Extract files from Result.Files
                 files = result.get("Files", []) or []  # Handle None case
-                print(f"[DEBUG] Zoekt returned {len(files)} file objects from Result.Files")
+                self.logger.debug(f"Zoekt returned {len(files)} file objects from Result.Files")
                 if files and len(files) > 0:
-                    print(f"[DEBUG] First file keys: {list(files[0].keys()) if isinstance(files[0], dict) else 'not a dict'}")
+                    self.logger.debug(f"First file keys: {list(files[0].keys()) if isinstance(files[0], dict) else 'not a dict'}")
                 return files
             elif isinstance(result, list):
                 # Fallback for older API returning a list directly
-                print(f"[DEBUG] Result is a list with {len(result)} items")
+                # Fallback for older API returning a list directly
+                self.logger.debug(f"Result is a list with {len(result)} items")
                 return result
             else:
                 # If Files is at top level (unlikely but handle it)
                 files = data.get("Files", [])
-                print(f"[DEBUG] Fallback to top-level Files: {len(files)} items")
+                self.logger.debug(f"Fallback to top-level Files: {len(files)} items")
                 return files
         except requests.RequestException as e:
-            print(f"Zoekt Search Failed: {e}")
+            self.logger.error(f"Zoekt Search Failed: {e}")
             return []
 
     def find_symbol(self, symbol_name: str):

@@ -15,13 +15,26 @@ from src.tools.world_builder import WorldBuilder
 load_dotenv()
 console = Console()
 
+from rich.logging import RichHandler
+
 # Configure File Logging
+import time
+timestamp = time.strftime("%Y%m%d_%H%M%S")
 os.makedirs("logs", exist_ok=True)
+import sys
+
+# File Handler
+file_handler = logging.FileHandler(f"logs/agent_{timestamp}.log")
+file_handler.setLevel(logging.INFO)
+file_handler.setFormatter(logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
+
+# Rich Console Handler
+console_handler = RichHandler(rich_tracebacks=True, markup=True)
+console_handler.setLevel(logging.INFO)
+
 logging.basicConfig(
-    filename="logs/agent.log",
-    filemode='w',
     level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    handlers=[file_handler, console_handler]
 )
 logger = logging.getLogger(__name__)
 
@@ -74,35 +87,35 @@ def parse_args():
 
 async def run_single_issue(agent: AgentOrchestrator, issue: str):
     """Run the agent on a single issue and generate report."""
-    console.print(f"[bold yellow]Running on Issue:[/bold yellow] {issue}")
+    logger.info(f"[bold yellow]Running on Issue:[/bold yellow] {issue}")
     
     final_state = await agent.run(issue)
     report_path = ScorecardGenerator.generate_markdown_report(final_state)
     
-    console.print("[bold green]Agent Finished![/bold green]")
-    console.print(f"[bold cyan]Scorecard Generated:[/bold cyan] {report_path}")
+    logger.info("[bold green]Agent Finished![/bold green]")
+    logger.info(f"[bold cyan]Scorecard Generated:[/bold cyan] {report_path}")
     return final_state
 
 async def run_shadow_mode(agent: AgentOrchestrator, dataset_path: str, limit: int = 0):
     """Run the agent in Shadow Mode for FOR evaluation."""
-    console.print(f"[bold magenta]Running Shadow Mode Evaluation[/bold magenta]")
-    console.print(f"Dataset: {dataset_path}")
+    logger.info(f"[bold magenta]Running Shadow Mode Evaluation[/bold magenta]")
+    logger.info(f"Dataset: {dataset_path}")
     
     runner = ShadowTestRunner(dataset_path)
     dataset = runner.load_dataset(dataset_path)
     
     if not dataset:
-        console.print("[bold red]No dataset found![/bold red]")
+        logger.error("[bold red]No dataset found![/bold red]")
         return
     
     if limit > 0:
-        console.print(f"[yellow]Limiting execution to first {limit} cases[/yellow]")
+        logger.warning(f"[yellow]Limiting execution to first {limit} cases[/yellow]")
         dataset = dataset[:limit]
     
-    console.print(f"Loaded {len(dataset)} test cases")
+    logger.info(f"Loaded {len(dataset)} test cases")
     
     for case in dataset:
-        console.print(f"\n[bold yellow]Testing Case: {case['id']}[/bold yellow]")
+        logger.info(f"\n[bold yellow]Testing Case: {case['id']}[/bold yellow]")
         
         # Determine Repo Path
         target_repo = os.getenv("TARGET_REPO", "")
@@ -119,10 +132,10 @@ async def run_shadow_mode(agent: AgentOrchestrator, dataset_path: str, limit: in
             # --- BLIND ORACLE VERIFICATION (Post-Execution) ---
             has_oracle = "oracle_tests" in case and case["oracle_tests"]
             diff = final_state.get('generated_diff')
-            console.print(f"[DEBUG] Oracle Check: has_oracle={has_oracle}, diff_len={len(diff) if diff else 0}")
+            logger.debug(f"Oracle Check: has_oracle={has_oracle}, diff_len={len(diff) if diff else 0}")
             if has_oracle:
                  if diff:
-                     console.print(f"   [bold magenta]Running Oracle Verification on {len(case['oracle_tests'])} golden tests...[/bold magenta]")
+                     logger.info(f"   [bold magenta]Running Oracle Verification on {len(case['oracle_tests'])} golden tests...[/bold magenta]")
                      # We call the validator manually here
                      oracle_result = await agent.for_validator.validate_patch(
                          repo_path, 
@@ -142,16 +155,16 @@ async def run_shadow_mode(agent: AgentOrchestrator, dataset_path: str, limit: in
                      final_state.setdefault('critic_feedback', []).append(f"Oracle Verdict: {oracle_result.get('details')}")
                      
                      if oracle_result.get('for_score') == 100:
-                         console.print("   [bold green]✅ Oracle Verification PASSED[/bold green]")
+                         logger.info("   [bold green]✅ Oracle Verification PASSED[/bold green]")
                      else:
-                         console.print("   [bold red]❌ Oracle Verification FAILED[/bold red]")
+                         logger.warning("   [bold red]❌ Oracle Verification FAILED[/bold red]")
 
             # Agent "approves" if safety_score > 90
             approved = final_state.get('safety_score', 0) > 90
             
             # Generate Detailed Scorecard for this PR
             report_path = ScorecardGenerator.generate_markdown_report(final_state)
-            console.print(f"   ↳ Scorecard saved: {report_path}")
+            logger.info(f"   ↳ Scorecard saved: {report_path}")
 
             runner.record_result(
                 issue_id=case['id'],
@@ -160,7 +173,7 @@ async def run_shadow_mode(agent: AgentOrchestrator, dataset_path: str, limit: in
                 details=f"Score: {final_state.get('safety_score')} | Report: {report_path}"
             )
         except Exception as e:
-            console.print(f"[red]Error: {e}[/red]")
+            logger.exception(f"[red]Error: {e}[/red]")
             runner.record_result(case['id'], case.get('has_bug', False), False, str(e))
         finally:
             # RESET TIME: Always go back to main
@@ -169,11 +182,11 @@ async def run_shadow_mode(agent: AgentOrchestrator, dataset_path: str, limit: in
     
     # Print Summary
     summary = runner.summary()
-    console.print("\n[bold cyan]═══ SHADOW MODE RESULTS ═══[/bold cyan]")
-    console.print(f"Total Tests: {summary['total_tests']}")
-    console.print(f"False Omissions: {summary['false_omissions']}")
-    console.print(f"FOR Percentage: {summary['for_percentage']}%")
-    console.print(f"[bold]FOR Safety Score: {summary['for_score']}/100[/bold]")
+    logger.info("\n[bold cyan]═══ SHADOW MODE RESULTS ═══[/bold cyan]")
+    logger.info(f"Total Tests: {summary['total_tests']}")
+    logger.info(f"False Omissions: {summary['false_omissions']}")
+    logger.info(f"FOR Percentage: {summary['for_percentage']}%")
+    logger.info(f"[bold]FOR Safety Score: {summary['for_score']}/100[/bold]")
     
     # Save Results to Disk
     import time
@@ -182,7 +195,7 @@ async def run_shadow_mode(agent: AgentOrchestrator, dataset_path: str, limit: in
     report_file = f"reports/shadow_results_{timestamp}.json"
     with open(report_file, "w") as f:
         json.dump(runner.results, f, default=lambda o: o.__dict__, indent=2)
-    console.print(f"[green]Detailed results saved to: {report_file}[/green]")
+    logger.info(f"[green]Detailed results saved to: {report_file}[/green]")
 
 async def main():
     args = parse_args()
@@ -197,7 +210,7 @@ async def main():
     if args.create_sample_dataset:
         runner = ShadowTestRunner()
         path = runner.create_sample_dataset()
-        console.print(f"[green]Sample dataset created: {path}[/green]")
+        logger.info(f"[green]Sample dataset created: {path}[/green]")
         return
         
     # Handle GitHub Fetching
@@ -205,12 +218,13 @@ async def main():
         token = os.getenv("GITHUB_TOKEN")
         fetcher = GitHubPRFetcher(args.fetch_prs, token)
         dataset = fetcher.fetch_recent_prs(days=90)
+        dataset = fetcher.fetch_recent_prs(days=90)
         path = fetcher.save_dataset(dataset)
-        console.print(f"[green]Shadow Dataset Created: {path}[/green]")
-        console.print(f"Run with: python src/main.py --shadow {path}")
+        logger.info(f"[green]Shadow Dataset Created: {path}[/green]")
+        logger.info(f"Run with: python src/main.py --shadow {path}")
         return
     
-    console.print("[bold green]Artificial Architect System Initializing...[/bold green]")
+    logger.info("[bold green]Artificial Architect System Initializing...[/bold green]")
     
     # Required API keys
     if not os.getenv("OPENAI_API_KEY"):
@@ -218,13 +232,13 @@ async def main():
     
     # Optional (will fall back to OpenAI if missing)
     if not os.getenv("ANTHROPIC_API_KEY"):
-        print("⚠️ ANTHROPIC_API_KEY not found - will use OpenAI GPT-4.1 for Brain")
+        logger.warning("⚠️ ANTHROPIC_API_KEY not found - will use OpenAI GPT-4.1 for Brain")
     
     if not os.getenv("GITHUB_TOKEN"):
-        print("⚠️ GITHUB_TOKEN not found - API rate limits will apply")
+        logger.warning("⚠️ GITHUB_TOKEN not found - API rate limits will apply")
 
     # Initialize the Brain
-    console.print(f"[bold blue]Initializing Agent for: {args.repo_type}[/bold blue]")
+    logger.info(f"[bold blue]Initializing Agent for: {args.repo_type}[/bold blue]")
     agent = AgentOrchestrator(repo_type=args.repo_type)
     
     try:
@@ -240,7 +254,7 @@ async def main():
             await run_single_issue(agent, sample)
             
     except Exception as e:
-        console.print(f"[bold red]Agent Failed:[/bold red] {e}")
+        logger.exception(f"[bold red]Agent Failed:[/bold red] {e}")
     finally:
         await agent.shutdown()
 

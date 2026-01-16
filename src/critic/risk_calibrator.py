@@ -1,6 +1,9 @@
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from typing import Tuple
+import logging
+
+logger = logging.getLogger(__name__)
 
 class RiskCalibrator:
     """
@@ -31,7 +34,9 @@ Respond with JSON: {"risk_level": "CRITICAL|HIGH|MEDIUM|LOW|TRIVIAL", "score": 1
         """
         chain = self.prompt | self.llm
         try:
+            logger.debug(f"[RiskCalibrator] Assessing risk for change: {change_description[:50]}...")
             response = await chain.ainvoke({"change_description": change_description})
+            logger.info(f"💰 [RISK] Model output:\n{response.content}\n--------------------------------------------------")
             import json
             data = json.loads(response.content)
             return data.get("risk_level", "MEDIUM"), data.get("score", 5), data.get("reason", "")
