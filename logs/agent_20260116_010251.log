@@ -1,0 +1,4 @@
+2026-01-16 01:02:51,040 - __main__ - INFO - [bold green]Artificial Architect System Initializing...[/bold green]
+2026-01-16 01:02:51,044 - __main__ - WARNING - ⚠️ ANTHROPIC_API_KEY not found - will use OpenAI GPT-4.1 for Brain
+2026-01-16 01:02:51,047 - __main__ - INFO - [bold blue]Initializing Agent for: general[/bold blue]
+2026-01-16 01:02:51,049 - src.core.orchestrator - WARNING - ⚠️ Anthropic API key not configured, using gpt-4.1
